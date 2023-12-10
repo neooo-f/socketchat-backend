@@ -11,14 +11,118 @@ datasource db {
 }
 
 model User {
+  id          String   @id @default(uuid())
+  username    String   @unique
+  password    String
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  biography   String
+  s3File      S3File   @relation(fields: [s3FileId], references: [id])
+  s3FileId    String   @map("profileImageId")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  dailyPosts DailyPost[]
+  Message    Message[]
+  GroupUser  GroupUser[]
+  fromUser   UserUser[]  @relation("fromUser")
+  toUser     UserUser[]  @relation("toUser")
+  Reciever   Reciever[]
+}
+
+model UserUser {
+  fromUser   User    @relation("fromUser", fields: [fromUserId], references: [id])
+  fromUserId String
+  toUser     User    @relation("toUser", fields: [toUserId], references: [id])
+  toUserId   String
+  added      Boolean @default(false)
+  muted      Boolean @default(false)
+  blocked    Boolean @default(false)
+  archived   Boolean @default(false)
+
+  @@id([fromUserId, toUserId])
+}
+
+// for All Chats (single and group) like a logtable
+model Reciever {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId String
+  // if groupId is null, the message is to a single chat and not not to a group chat
+  group     Group?  @relation(fields: [groupId], references: [id])
+  groupId   String?
+  read      Boolean @default(false)
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  s3File      S3File   @relation(fields: [s3FileId], references: [id])
+  s3FileId    String   @map("groupImageId")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  GroupUser GroupUser[]
+  Reciever  Reciever[]
+}
+
+model GroupUser {
+  group        Group   @relation(fields: [groupId], references: [id])
+  groupId      String
+  user         User    @relation(fields: [userId], references: [id])
+  userId       String
+  archived     Boolean @default(false)
+  muted        Boolean @default(false)
+  included     Boolean @default(true)
+  isGroupAdmin Boolean @default(false)
+
+  @@id(fields: [groupId, userId])
+}
+
+model S3File {
   id           String   @id @default(uuid())
-  username     String   @unique
-  password     String
-  firstName    String
-  lastName     String
-  dateOfBirth  DateTime
-  biography    String
-  profileImage String // map from s3file table
+  s3FileKey    String
+  originalName String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  mimeType     String
+
+  DailyPost   DailyPost[]
+  User        User[]
+  Group       Group[]
+  MessageFile MessageFile[]
+}
+
+model DailyPost {
+  id        String   @id @default(uuid())
+  User      User     @relation(fields: [userId], references: [id])
+  userId    String
+  s3File    S3File   @relation(fields: [s3FileId], references: [id])
+  s3FileId  String   @map("imageId")
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id      String @id @default(uuid())
+  User    User   @relation(fields: [userId], references: [id])
+  userId  String @map("senderId")
+  content String @db.Text
+
+  MessageFile MessageFile[]
+  Reciever    Reciever[]
+}
+
+model MessageFile {
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId String
+  s3File    S3File  @relation(fields: [s3FileId], references: [id])
+  s3FileId  String
+
+  @@id([messageId, s3FileId])
 }

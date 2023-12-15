@@ -16,10 +16,11 @@ model User {
   password    String
   firstName   String
   lastName    String
-  dateOfBirth DateTime
-  biography   String
-  s3File      S3File   @relation(fields: [s3FileId], references: [id])
-  s3FileId    String   @map("profileImageId")
+  gender      Gender
+  dateOfBirth DateTime @db.Date
+  biography   String?  @db.Text
+  s3File      S3File?  @relation(fields: [s3FileId], references: [id])
+  s3FileId    String?  @map("profileImageId")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -46,7 +47,6 @@ model UserUser {
 
 // for All Chats (single and group) like a logtable
 model Reciever {
-  id        String  @id @default(uuid())
   user      User    @relation(fields: [userId], references: [id])
   userId    String
   message   Message @relation(fields: [messageId], references: [id])
@@ -55,6 +55,8 @@ model Reciever {
   group     Group?  @relation(fields: [groupId], references: [id])
   groupId   String?
   read      Boolean @default(false)
+
+  @@id([userId, messageId])
 }
 
 model Group {
@@ -80,12 +82,13 @@ model GroupUser {
   included     Boolean @default(true)
   isGroupAdmin Boolean @default(false)
 
-  @@id(fields: [groupId, userId])
+  @@id([groupId, userId])
 }
 
 model S3File {
   id           String   @id @default(uuid())
   s3FileKey    String
+  s3Bucket     String
   originalName String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -109,10 +112,11 @@ model DailyPost {
 }
 
 model Message {
-  id      String @id @default(uuid())
-  User    User   @relation(fields: [userId], references: [id])
-  userId  String @map("senderId")
-  content String @db.Text
+  id        String   @id @default(uuid())
+  User      User     @relation(fields: [userId], references: [id])
+  userId    String   @map("senderId")
+  content   String   @db.Text
+  createdAt DateTime @default(now())
 
   MessageFile MessageFile[]
   Reciever    Reciever[]
@@ -125,4 +129,10 @@ model MessageFile {
   s3FileId  String
 
   @@id([messageId, s3FileId])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }

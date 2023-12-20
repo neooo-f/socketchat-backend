@@ -5,12 +5,14 @@ import {
   IsStrongPassword,
   IsAlpha,
   IsNotEmpty,
-  IsDateString,
   MinDate,
   MaxDate,
   IsOptional,
+  IsDate,
+  IsDateString,
 } from 'class-validator';
 import { Gender } from '@prisma/client';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -38,32 +40,18 @@ export class CreateUserDto {
   gender: Gender;
 
   @IsNotEmpty()
-  @MinDate(
-    (): Date => {
-      const currentDate = new Date();
-      currentDate.setFullYear(currentDate.getFullYear() - 100);
-      return currentDate;
-    },
-    {
-      message: 'People over 100 are not allowed.',
-    },
-  )
-  @MaxDate(
-    (): Date => {
-      const currentDate = new Date();
-      currentDate.setFullYear(currentDate.getFullYear() - 12);
-      return currentDate;
-    },
-    { message: 'People under 12 are not allowed.' },
-  )
+  /* @Type(() => Date) // cast to Date type
+  @MaxDate(() => new Date('2006-01-01'), {
+    message: 'Das Datum muss vor dem Jahr 2006 liegen.',
+  })
+  @MinDate(() => new Date('1969-01-01'), {
+    message: 'Das Datum muss nach dem Jahr 1969 liegen.',
+  })
+  @IsDate() */
   @IsDateString()
-  dateOfBirth: Date;
+  dateOfBirth: string;
 
   @IsOptional()
   @IsString()
   biography: string;
-
-  /* @IsOptional()
-  @IsUUID()
-  s3FileId: string; */ // S3 File logic here (validation etc.)
 }

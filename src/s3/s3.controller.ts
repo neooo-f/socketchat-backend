@@ -27,8 +27,8 @@ export class S3Controller {
     @UploadedFile() file: Express.Multer.File,
     @Param('location') location: string,
   ): Promise<{ url: string }> {
-    const url = await this.s3Service.uploadFile(file, location);
-    return { url };
+    const res = await this.s3Service.uploadFile(file, location);
+    return { url: res.location };
   }
 
   @Patch(':id')

@@ -44,7 +44,7 @@ export class S3Service {
   async uploadFile(
     file: Express.Multer.File,
     location: string,
-  ): Promise<string> {
+  ): Promise<{ location: string; id: string }> {
     const fileBuffer = file.buffer;
     const key = `${location}/${Date.now()}_${file.originalname}`;
 
@@ -58,14 +58,15 @@ export class S3Service {
     const upload: ManagedUpload = this.s3.upload(params);
     const result: S3.ManagedUpload.SendData = await upload.promise();
 
-    await this.saveFileInfo(
+    const s3File = await this.saveFileInfo(
       key,
       process.env.S3_BUCKET_NAME,
       file.originalname,
       file.mimetype,
     );
 
-    return result.Location;
+    return { location: result.Location, id: s3File.id };
+    //return result.Location;
   }
 
   async deleteFile(id: string): Promise<S3File> {

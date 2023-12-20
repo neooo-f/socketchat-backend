@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { User } from '@prisma/client';
-// import { hash } from 'bcrypt';
-// import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { S3Service } from 'src/s3/s3.service';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private s3Service: S3Service,
+  ) {}
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return this.prisma.user.findUnique({
@@ -20,25 +24,23 @@ export class UserService {
     });
   }
 
-  //   async createUser(data: CreateUserDto): Promise<User> {
-  //     const { postcode, location, ...userData } = data;
+  async createUser(
+    profileImage: Express.Multer.File,
+    user: CreateUserDto,
+  ): Promise<User> {
+    const s3File = await this.s3Service.uploadFile(profileImage, 'profile');
+    user.password = await hash(user.password, 10);
+    user.dateOfBirth = new Date(user.dateOfBirth).toISOString();
 
-  //     userData.password = await hash(userData.password, 10);
-
-  //     const postcodeEntry = await this.postcodeService.findOrCreatePostcode(
-  //       postcode,
-  //       location,
-  //     );
-
-  //     return this.prisma.user.create({
-  //       data: {
-  //         ...userData,
-  //         postcode: {
-  //           connect: { id: postcodeEntry.id },
-  //         },
-  //       },
-  //     });
-  //   }
+    return this.prisma.user.create({
+      data: {
+        ...user,
+        s3File: {
+          connect: { id: s3File.id },
+        },
+      },
+    });
+  }
 
   //   async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
   //     const { postcode, location, ...userData } = updateData;

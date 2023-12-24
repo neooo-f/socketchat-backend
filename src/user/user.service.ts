@@ -42,6 +42,36 @@ export class UserService {
     });
   }
 
+  async getUserWithInteractionsByUserIds(
+    fromUserId: string,
+    toUserId: string,
+  ): Promise<any | undefined> {
+    return this.prisma.userUser.findFirst({
+      where: { fromUserId: String(fromUserId), toUserId: String(toUserId) },
+      include: {
+        toUser: {
+          select: {
+            // TODO: CHECK: should return every property except the password of the user
+            password: false,
+            createdAt: false,
+            updatedAt: false,
+          },
+        },
+      },
+    });
+  }
+
+  async updateUser(
+    updatedProfileImage: Express.Multer.File,
+    updatedUser: UpdateUserDto,
+  ): Promise<Partial<User>> {
+    await this.s3Service.updateFile(updatedProfileImage, updatedUser.s3FileId);
+
+    // return this.prisma.user.update({
+    //   where: {  }
+    // })
+  }
+
   //   async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
   //     const { postcode, location, ...userData } = updateData;
 

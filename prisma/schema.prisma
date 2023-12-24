@@ -63,8 +63,8 @@ model Group {
   id          String   @id @default(uuid())
   name        String
   description String?
-  s3File      S3File   @relation(fields: [s3FileId], references: [id])
-  s3FileId    String   @map("groupImageId")
+  s3File      S3File?  @relation(fields: [s3FileId], references: [id])
+  s3FileId    String?  @map("groupImageId")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

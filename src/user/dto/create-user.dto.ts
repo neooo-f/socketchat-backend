@@ -5,14 +5,10 @@ import {
   IsStrongPassword,
   IsAlpha,
   IsNotEmpty,
-  MinDate,
-  MaxDate,
   IsOptional,
-  IsDate,
   IsDateString,
 } from 'class-validator';
 import { Gender } from '@prisma/client';
-import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsNotEmpty()

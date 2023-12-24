@@ -43,7 +43,7 @@ CREATE TABLE `Group` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
-    `groupImageId` VARCHAR(191) NOT NULL,
+    `groupImageId` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -124,7 +124,7 @@ ALTER TABLE `Reciever` ADD CONSTRAINT `Reciever_messageId_fkey` FOREIGN KEY (`me
 ALTER TABLE `Reciever` ADD CONSTRAINT `Reciever_groupId_fkey` FOREIGN KEY (`groupId`) REFERENCES `Group`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Group` ADD CONSTRAINT `Group_groupImageId_fkey` FOREIGN KEY (`groupImageId`) REFERENCES `S3File`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Group` ADD CONSTRAINT `Group_groupImageId_fkey` FOREIGN KEY (`groupImageId`) REFERENCES `S3File`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `GroupUser` ADD CONSTRAINT `GroupUser_groupId_fkey` FOREIGN KEY (`groupId`) REFERENCES `Group`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

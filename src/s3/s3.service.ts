@@ -103,6 +103,7 @@ export class S3Service {
     const upadte = this.s3.putObject(params);
     await upadte.promise();
 
+    // TOOD: check if return is needed
     return this.prisma.s3File.update({
       where: { id: String(id) },
       data: {

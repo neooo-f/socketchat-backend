@@ -5,10 +5,15 @@ import {
   IsAlpha,
   IsNotEmpty,
   IsOptional,
+  IsDefined,
 } from 'class-validator';
 import { Gender } from '@prisma/client';
 
 export class UpdateUserDto {
+  @IsNotEmpty()
+  @IsDefined()
+  id: string;
+
   @IsNotEmpty()
   @IsStrongPassword()
   password: string;

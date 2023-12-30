@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { S3Service } from 'src/s3/s3.service';
 import { hash } from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -42,62 +43,40 @@ export class UserService {
     });
   }
 
-  async getUserWithInteractionsByUserIds(
-    fromUserId: string,
-    toUserId: string,
-  ): Promise<any | undefined> {
-    return this.prisma.userUser.findFirst({
-      where: { fromUserId: String(fromUserId), toUserId: String(toUserId) },
-      include: {
-        toUser: {
-          select: {
-            // TODO: CHECK: should return every property except the password of the user
-            password: false,
-            createdAt: false,
-            updatedAt: false,
-          },
-        },
-      },
-    });
-  }
-
   async updateUser(
     updatedProfileImage: Express.Multer.File,
     updatedUser: UpdateUserDto,
   ): Promise<Partial<User>> {
-    await this.s3Service.updateFile(updatedProfileImage, updatedUser.s3FileId);
+    // TODO: check if user already has a profile image if he wants to change it
+    // TODO: destructure at the top
+
+    if (updatedUser.s3FileId && updatedProfileImage) {
+      // await this.s3Service.updateFile(
+      //   updatedProfileImage,
+      //   updatedUser.s3FileId,
+      // );
+    }
+
+    if (!updatedUser.s3FileId && updatedProfileImage) {
+      // const res = await this.s3Service.uploadFile(
+      //   updatedProfileImage,
+      //   'profile',
+      // );
+      // const { id } = res;
+      // this.prisma.user.update({
+      //   data: {
+      //     ...updatedUser,
+      //     s3File: {
+      //       connect: { id: id },
+      //     },
+      //   },
+      //   where: {  }
+      // });
+      return null;
+    }
 
     // return this.prisma.user.update({
     //   where: {  }
     // })
   }
-
-  //   async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
-  //     const { postcode, location, ...userData } = updateData;
-
-  //     if (
-  //       updateData.postcode !== undefined ||
-  //       updateData.location !== undefined
-  //     ) {
-  //       const postcodeRecord = await this.postcodeService.findOrCreatePostcode(
-  //         postcode,
-  //         location,
-  //       );
-
-  //       return this.prisma.user.update({
-  //         where: { id: id },
-  //         data: {
-  //           ...userData,
-  //           postcode: {
-  //             connect: { id: postcodeRecord.id },
-  //           },
-  //         },
-  //       });
-  //     } else {
-  //       return this.prisma.user.update({
-  //         where: { id: id },
-  //         data: userData,
-  //       });
-  //     }
-  //   }
 }

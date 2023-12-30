@@ -118,6 +118,7 @@ const groupUsers = [
     groupId: 'd2e1e6bc-0d81-47db-a6b0-d4eccadc25c5',
     userId: 'caf40c1e-c690-4000-9f4b-17db2e94b23e',
   },
+
   {
     groupId: '450b32ce-9eb7-4a82-985c-3be5ad50bf0b',
     userId: '41ff2b88-0b76-43d9-9d96-39a0c2aa1a2e',
@@ -149,6 +150,11 @@ const messages = [
     userId: '7bc3dbf1-fb28-4c69-a3b0-b415cd04d314',
     content: 'Ey larissa tue doch ned so',
   },
+  {
+    id: '2fd5e4dd-28dd-4bbb-9b37-92d4d412ae37',
+    userId: 'caf40c1e-c690-4000-9f4b-17db2e94b23e',
+    content: 'ey bres wa laaauft',
+  },
 ];
 
 const recievers = [
@@ -163,6 +169,23 @@ const recievers = [
   {
     userId: 'cbab1e58-bea2-43bc-a803-46e7c63967df',
     messageId: '39d91563-0ce3-4263-8c87-f10dba05a584',
+  },
+
+  {
+    userId: '41ff2b88-0b76-43d9-9d96-39a0c2aa1a2e',
+    messageId: '2fd5e4dd-28dd-4bbb-9b37-92d4d412ae37',
+    groupId: '450b32ce-9eb7-4a82-985c-3be5ad50bf0b',
+  },
+  {
+    userId: '7bc3dbf1-fb28-4c69-a3b0-b415cd04d314',
+    messageId: '2fd5e4dd-28dd-4bbb-9b37-92d4d412ae37',
+    groupId: '450b32ce-9eb7-4a82-985c-3be5ad50bf0b',
+  },
+  {
+    // dont know if important because he sent already
+    userId: 'caf40c1e-c690-4000-9f4b-17db2e94b23e',
+    messageId: '2fd5e4dd-28dd-4bbb-9b37-92d4d412ae37',
+    groupId: '450b32ce-9eb7-4a82-985c-3be5ad50bf0b',
   },
 ];
 

@@ -5,9 +5,15 @@ import { S3Module } from './s3/s3.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './common/auth/auth.module';
 import { EventModule } from './event/event.module';
+import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
+    GroupModule,
+    MessageModule,
+    ChatModule,
     EventModule,
     AuthModule,
     UserModule,

@@ -12,6 +12,7 @@ import { S3Service } from './s3.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3File } from '@prisma/client';
 
+// TODO: check if needed in future
 @Controller('s3')
 export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}

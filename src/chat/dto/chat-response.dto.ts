@@ -1,6 +1,8 @@
 export class ChatResponseDto {
   name: string;
-  profileImageUrl: string; // s3file signed url
+  userId?: string; // only userId or groupId
+  groupId?: string;
+  profileImageUrl: string | null; // s3file signed url
   unreadMessages: number;
   archived: boolean;
   muted: boolean;

@@ -1,11 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 
+type UserConnectionSelect = {
+  toUserId: string;
+  archived: boolean;
+  muted: boolean;
+  blocked: boolean;
+  toUser: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    s3FileId: string;
+  };
+};
+
+type UserConnectionWithUnreadMessages = UserConnectionSelect & {
+  unreadMessages: number;
+};
+
 @Injectable()
 export class UserConnectionService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserConnections(userId: string): Promise<any[]> {
+  async getAllUserConnections(
+    userId: string,
+  ): Promise<UserConnectionWithUnreadMessages[]> {
     const userConnections = await this.prisma.userUser.findMany({
       where: { fromUserId: String(userId) },
       select: {
@@ -18,12 +37,14 @@ export class UserConnectionService {
             username: true,
             firstName: true,
             lastName: true,
+            s3FileId: true,
           },
         },
       },
     });
 
-    const userConnectionsWithUnreadMessageCount = [];
+    const userConnectionsWithUnreadMessageCount: UserConnectionWithUnreadMessages[] =
+      [];
 
     for (const userConnection of userConnections) {
       const unreadMessages = await this.prisma.message.count({
@@ -56,10 +77,12 @@ export class UserConnectionService {
       include: {
         toUser: {
           select: {
-            // TODO: CHECK: should return every property except the password of the user
-            password: false,
-            createdAt: false,
-            updatedAt: false,
+            username: true,
+            lastName: true,
+            gender: true,
+            dateOfBirth: true,
+            biography: true,
+            s3FileId: true,
           },
         },
       },

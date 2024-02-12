@@ -55,6 +55,52 @@ export class ChatService {
     return chats;
   }
 
+  async getChat(
+    fromUserId: string,
+    toUserId?: string,
+    toGroupId?: string,
+  ): Promise<ChatResponseDto> {
+    if (toGroupId) {
+      const userGroup = await this.groupService.getUserGroup(
+        fromUserId,
+        toGroupId,
+      );
+
+      return {
+        groupId: userGroup.groupId,
+        name: userGroup.group.name,
+        profileImageUrl: userGroup.group.s3FileId
+          ? await this.s3Service.getFileUrlByLocalId(userGroup.group.s3FileId)
+          : null,
+        unreadMessages: userGroup.unreadMessages,
+        archived: userGroup.archived,
+        muted: userGroup.muted,
+        included: userGroup.included || false,
+      };
+    }
+
+    if (toUserId) {
+      const userConnection = await this.userConnectionService.getUserConnection(
+        fromUserId,
+        toUserId,
+      );
+
+      return {
+        userId: userConnection.toUserId,
+        name: `${userConnection.toUser.firstName} ${userConnection.toUser.lastName}`,
+        profileImageUrl: userConnection.toUser.s3FileId
+          ? await this.s3Service.getFileUrlByLocalId(
+              userConnection.toUser.s3FileId,
+            )
+          : null,
+        unreadMessages: userConnection.unreadMessages,
+        archived: userConnection.archived,
+        muted: userConnection.muted,
+        blocked: userConnection.blocked || false,
+      };
+    }
+  }
+
   // TODO: implement
   async getChatsByUserIdContaining(): Promise<ChatResponseDto[]> {
     return null;

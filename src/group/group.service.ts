@@ -62,4 +62,39 @@ export class GroupService {
 
     return userGroupsWithUnreadMessageCount;
   }
+
+  async getUserGroup(
+    userId: string,
+    groupId: string,
+  ): Promise<UserGroupWithUnreadMessages> {
+    const userGroup = await this.prisma.groupUser.findFirst({
+      where: { userId: String(userId), groupId: String(groupId) },
+      select: {
+        groupId: true,
+        archived: true,
+        muted: true,
+        included: true,
+        group: {
+          select: {
+            name: true,
+            s3FileId: true,
+            Reciever: {
+              where: {
+                userId: String(userId),
+                read: false,
+              },
+              select: {
+                read: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      ...userGroup,
+      unreadMessages: userGroup.group.Reciever.length,
+    };
+  }
 }

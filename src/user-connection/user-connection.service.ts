@@ -68,6 +68,44 @@ export class UserConnectionService {
     return userConnectionsWithUnreadMessageCount;
   }
 
+  async getUserConnection(
+    fromUserId: string,
+    toUserId: string,
+  ): Promise<UserConnectionWithUnreadMessages> {
+    const userConnection = await this.prisma.userUser.findFirst({
+      where: { fromUserId: String(fromUserId), toUserId: String(toUserId) },
+      select: {
+        toUserId: true,
+        archived: true,
+        muted: true,
+        blocked: true,
+        toUser: {
+          select: {
+            username: true,
+            firstName: true,
+            lastName: true,
+            s3FileId: true,
+          },
+        },
+      },
+    });
+
+    return {
+      ...userConnection,
+      unreadMessages: await this.prisma.message.count({
+        where: {
+          userId: String(userConnection.toUserId),
+          Reciever: {
+            every: {
+              userId: String(fromUserId),
+              read: false,
+            },
+          },
+        },
+      }),
+    };
+  }
+
   async getUserWithInteractionsByUserIds(
     fromUserId: string,
     toUserId: string,

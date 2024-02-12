@@ -51,6 +51,7 @@ export class UserController {
       return this.userService.updateUser(user.id, postData);
   } */
 
+  // TODO: still needed?
   @Get('me')
   getProfile(@CurrentUser() user: Partial<User>) {
     return this.userService.getUserByUsername(user.username);

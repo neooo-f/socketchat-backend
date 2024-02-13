@@ -58,6 +58,16 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(
         `Client ${client.id} (User ${createMessageDto.fromUserId}) sended message: ${createMessageDto.content} to group: ${createMessageDto.toGroupId}`,
       );
+
+      const message = await this.messageService.createMessage(
+        createMessageDto.fromUserId,
+        createMessageDto.content,
+        undefined,
+        createMessageDto.toGroupId,
+      );
+      console.log(message);
+      client.emit('message', createMessageDto);
+      client.to(createMessageDto.toGroupId).emit('message', message);
     }
 
     if (createMessageDto.toUserId) {
@@ -69,6 +79,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         createMessageDto.fromUserId,
         createMessageDto.content,
         createMessageDto.toUserId,
+        undefined,
       );
       console.log(message);
       client.emit('message', createMessageDto);

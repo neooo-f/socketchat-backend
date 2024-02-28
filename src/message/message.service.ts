@@ -11,6 +11,7 @@ export class MessageService {
     private userService: UserService,
   ) {}
 
+  // TODO: mark messages as read in reciever which got sent by fromUser
   async createMessage(
     fromUserId: string,
     content: string,
@@ -82,6 +83,7 @@ export class MessageService {
       return this.getSingleMessages(fromUserId, toUserId, take, skip);
     }
 
+    // TOOD: error handling!
     return null;
   }
 
@@ -114,15 +116,30 @@ export class MessageService {
           },
         ],
       },
+      select: {
+        userId: true,
+        content: true,
+        createdAt: true,
+        User: {
+          select: {
+            firstName: true,
+          },
+        },
+      },
       take: Number(take),
       skip: Number(skip),
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
 
-    console.log('SINGLE MESSAGES BETWEEN PERSONS: ', messages);
-    return null;
+    return messages.map((message) => ({
+      userId: message.userId,
+      firstName: message.User.firstName,
+      content: message.content,
+      isIncoming: message.userId === toUserId,
+      createdAt: message.createdAt,
+    }));
   }
 
   async getGroupMessages(
@@ -137,14 +154,29 @@ export class MessageService {
           some: { groupId: String(groupId) },
         },
       },
+      select: {
+        userId: true,
+        content: true,
+        createdAt: true,
+        User: {
+          select: {
+            firstName: true,
+          },
+        },
+      },
       take: Number(take),
       skip: Number(skip),
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
 
-    console.log('GROUP MESSAGES: ', messages);
-    return null;
+    return messages.map((message) => ({
+      userId: message.userId,
+      firstName: message.User.firstName,
+      content: message.content,
+      isIncoming: message.userId !== fromUserId,
+      createdAt: message.createdAt,
+    }));
   }
 }
